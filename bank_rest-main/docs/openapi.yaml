@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: Bank Cards REST API
+  description: API для управления пользователями, картами и переводами
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+    description: Локальный сервер разработки
+
+paths:
+  /api/auth/login:
+    post:
+      summary: Аутентификация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Успешная аутентификация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Неверные учетные данные
+
+  /api/users:
+    post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Ошибка валидации
+
+    get:
+      summary: Получить список всех пользователей
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+  /api/users/{username}:
+    get:
+      summary: Получить пользователя по имени
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Пользователь не найден
+
+  /api/cards:
+    get:
+      summary: Получить все карты (админ)
+      responses:
+        '200':
+          description: Список карт
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardResponse'
+
+  /api/cards/{cardId}:
+    get:
+      summary: Получить карту по ID
+    put:
+      summary: Обновить карту
+    delete:
+      summary: Удалить карту
+
+  /api/cards/{cardId}/block:
+    post:
+      summary: Заблокировать карту
+
+  /api/cards/{cardId}/activate:
+    post:
+      summary: Активировать карту
+
+  /api/cards/transfer:
+    post:
+      summary: Перевод средств между картами
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Перевод выполнен
+        '400':
+          description: Ошибка перевода
+
+components:
+  schemas:
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    UserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+        cardHolderName:
+          type: string
+
+    CardCreateRequest:
+      type: object
+      properties:
+        cardNumber:
+          type: string
+        cardholderName:
+          type: string
+        expiryDate:
+          type: string
+          format: date
+        initialBalance:
+          type: number
+          format: double
+
+    CardUpdateRequest:
+      type: object
+      properties:
+        cardholderName:
+          type: string
+        expiryDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [ACTIVE, BLOCKED]
+
+    CardResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        maskedCardNumber:
+          type: string
+        cardholderName:
+          type: string
+        expiryDate:
+          type: string
+          format: date
+        status:
+          type: string
+        balance:
+          type: number
+          format: double
+        userId:
+          type: integer
+
+    TransferRequest:
+      type: object
+      properties:
+        fromCardNumber:
+          type: string
+        toCardNumber:
+          type: string
+        amount:
+          type: number
+          format: double
+
+    ErrorDetails:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        code:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string

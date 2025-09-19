@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: your_name
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password
+                  value: "$2a$10$w0B.Gg4L3dK7g9N1h.A.z.u2s.y/R/x/q.j.y.A.m.z.x.n.a.m.w.x.h.C" # Encoded "admin" password (You'll generate this in your SecurityConfig)
+              - column:
+                  name: role
+                  value: "ADMIN"
+              - column:
+                  name: card_holder_name
+                  value: "Admin User"
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: "user"
+              - column:
+                  name: password
+                  value: "$2a$10$w0B.Gg4L3dK7g9N1h.A.z.u2s.y/R/x/q.j.y.A.m.z.x.n.a.m.w.x.h.C" # Encoded "user" password (You'll generate this in your SecurityConfig)
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: card_holder_name
+                  value: "Regular User"
